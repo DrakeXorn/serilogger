@@ -189,7 +189,7 @@ const logger2 = new LoggerConfiguration()
 |[ColoredConsoleSink](#colored-console-sink)|Outputs the same as **ConsoleSink** but with **Colors**.|
 |[ApiSink](#api-sink)|Outputs events to a custom API|
 |[SeqSink](#seq-sink)|Outputs events to a Seq server (extends ApiSink)|
-
+|[FileSink](#file-sink)|Outputs events to a rolling file|
 
 ### Filtering
 
@@ -407,6 +407,30 @@ It supports the following properties:
 |`levelSwitch`|DynamicLevelSwitch which the Seq log level will control and use|&#x2717;|
 |`suppressErrors`|If true, errors in the pipeline will be suppressed and logged to the console instead (defaults to true)|&#x2717;|
 |`url`|URL to the Seq server|&#x2713;|
+
+### File Sink
+
+The `FileSink` outputs events to a rolling file. It can be used like any of the other sinks.
+
+```js
+.writeTo(new FileSink({
+  outputDir: './logs',
+  fileName: 'app-logs',
+  maxFileSize: FileSize.ONE_MB * 10
+}))
+```
+
+The `options` parameter is required. It supports the following properties:
+
+|Key|Description|Default|
+|---|---|---|
+|`outputDir`|The directory in which the log files are written|`'./logs'`|
+|`maxFileSize`|The maximum file size in KB before the file rolls. By default at 10 MB.|`10_485_760`|
+|`logEventLevel`|If set, only events of the specified level or higher will be output to the console.|`verbose`|
+|`fileName`|The name of the file that is written in the `outputDir` folder. No extension necessary as the log file always ends with `.log`. If no file name is provided, the system will use the current date with format YYYY-MM-DD.|`undefined`|
+
+⚠️ The rolling system is not based on any interval. Whenever the sink is used, the system checks whether the file needs to roll or not. 
+If it does, it will append a number (starting at 1) to the file. The most recent file remains **without** number, and the oldest one has the smallest number.
 
 ## Child Logger Functionality
 

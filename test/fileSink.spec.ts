@@ -14,7 +14,11 @@ describe('FileSink', () => {
     let fileSystemMock: TypeMoq.IMock<typeof fsp>;
 
     beforeEach(() => {
-        fileSystemMock = TypeMoq.Mock.ofType<typeof fsp>();
+        fileSystemMock = TypeMoq.Mock.ofInstance<typeof fsp>(fsp, TypeMoq.MockBehavior.Strict);
+    });
+
+    afterEach(() => {
+        fileSystemMock.reset();
     });
 
     describe('emit()', () => {

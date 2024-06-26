@@ -56,7 +56,7 @@ describe('FileSink', () => {
             fileSystemMock.setup(fs => fs.access(TypeMoq.It.isAnyString(), TypeMoq.It.isAnyNumber())).returns(() => Promise.resolve());
             fileSystemMock.setup(fs => fs.stat(TypeMoq.It.isAnyString())).returns(() => Promise.resolve({ size: 1024 } as Stats));
             fileSystemMock.setup(fs => fs.appendFile(TypeMoq.It.isAnyString(), TypeMoq.It.isAnyString(), TypeMoq.It.isAny())).returns(() => Promise.resolve());
-            const sink = new FileSink({ logEventLevel: LogEventLevel.warning }, fileSystemMock.object);
+            const sink = new FileSink({ restrictedToMinimumLevel: LogEventLevel.warning }, fileSystemMock.object);
 
             sink.emit([new LogEvent('', LogEventLevel.information, new MessageTemplate('test'))]);
 

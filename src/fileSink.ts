@@ -1,6 +1,6 @@
 import * as fsp from 'fs/promises';
 
-import { LogEvent, LogEventLevel } from './logEvent';
+import { LogEvent, LogEventLevel, isEnabled } from './logEvent';
 import { Sink } from './sink';
 
 export enum FileSize {
@@ -12,14 +12,14 @@ export enum FileSize {
 export interface FileSinkOptions {
   fileName?: string;
   outputDir?: string;
-  logEventLevel?: LogEventLevel;
   maxFileSize?: number;
+  restrictedToMinimumLevel?: LogEventLevel;
 }
 
 export const defaultFileSinkOptions: FileSinkOptions = {
   outputDir: './logs',
-  logEventLevel: LogEventLevel.verbose,
   maxFileSize: FileSize.ONE_MB * 10,
+  restrictedToMinimumLevel: undefined,
 };
 
 export class FileSink implements Sink {
@@ -39,14 +39,14 @@ export class FileSink implements Sink {
   }
 
   public async emit(events: LogEvent[]) {
-    if (this.options.logEventLevel === LogEventLevel.off) return;
+    if (this.options.restrictedToMinimumLevel === LogEventLevel.off) return;
 
     await this.manageFiles();
 
     for (const event of events) {
-      if (this.options.logEventLevel === LogEventLevel.verbose || this.options.logEventLevel === event.level) {
-        this.content.push(`[${LogEventLevel[event.level]}] ${event.messageTemplate.render()}`);
-      }
+      if (!isEnabled(this.options.restrictedToMinimumLevel, event.level)) continue;
+
+      this.content.push(`[${LogEventLevel[event.level]}] ${event.messageTemplate.render()}`);
     }
 
     await this.flush();

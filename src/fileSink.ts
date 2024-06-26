@@ -1,3 +1,4 @@
+import { constants } from 'fs';
 import * as fsp from 'fs/promises';
 
 import { LogEvent, LogEventLevel, isEnabled } from './logEvent';
@@ -85,7 +86,7 @@ export class FileSink implements Sink {
    */
   private async checkFileExists() {
     try {
-      await this.fileSystem.access(this.filePath, fsp.constants.F_OK);
+      await this.fileSystem.access(this.filePath, constants.F_OK);
       this.content.push('\n');
     } catch (_error) {
       await this.fileSystem.writeFile(this.filePath, '', { encoding: 'utf-8' });
